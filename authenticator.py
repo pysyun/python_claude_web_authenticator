@@ -1,10 +1,14 @@
-from playwright.sync_api import sync_playwright
 import os
+
+from playwright.sync_api import sync_playwright
 
 
 class ClaudeAuthenticator:
 
     def process(self, _):
+
+        if 'CLAUDE_COOKIE' in os.environ:
+            return
 
         with sync_playwright() as p:
 

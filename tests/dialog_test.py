@@ -6,9 +6,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Authenticate using the automated Browser
-if 'CLAUDE_COOKIE' not in os.environ:
-    ClaudeAuthenticator().process([])
+# Authenticate using the automated Browser or saved token
+ClaudeAuthenticator().process([])
 
 # Create the Claude API client
 dialog = ClaudeDialog()
