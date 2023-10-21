@@ -1,10 +1,11 @@
+import os
 from claude_api import Client
 
 
 class ClaudeDialog:
 
-    def __init__(self, claude_cookie):
-        self.claude_cookie = claude_cookie
+    def __init__(self):
+        self.claude_cookie = os.environ['CLAUDE_COOKIE']
 
     def process(self, data):
         claude_api = Client(self.claude_cookie)

@@ -11,6 +11,6 @@ if 'CLAUDE_COOKIE' not in os.environ:
     ClaudeAuthenticator().process([])
 
 # Create the Claude API client
-dialog = ClaudeDialog(os.environ['CLAUDE_COOKIE'])
+dialog = ClaudeDialog()
 data = dialog.process(["Please, generate an advanced Rust 'Hello, world' application."])
 print(data)
