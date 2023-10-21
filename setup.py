@@ -5,6 +5,6 @@ setup(
     version='1.1.1',
     author='Immortal Tapok',
     author_email='irisa1704@gmail.com',
-    py_modules=['authenticator', 'connect'],
+    py_modules=['authenticator', 'dialog'],
     install_requires=['playwright', 'python-dotenv', 'claude-api']
 )
