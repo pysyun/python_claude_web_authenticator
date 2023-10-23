@@ -16,11 +16,12 @@ class ClaudeAuthenticator:
             page = browser.new_page()
             page.goto('https://claude.ai/login')
 
-            input('Press "enter" after you are logged into the account.')
+            while True:
+                cookies = page.context.cookies()
+                cookies_str = "; ".join([f"{cookie['name']}={cookie['value']}" for cookie in cookies])
+                if "sessionKey" in cookies_str:
+                    break
 
-            cookies = page.context.cookies()
-
-            cookies_str = "; ".join([f"{cookie['name']}={cookie['value']}" for cookie in cookies])
             os.environ["CLAUDE_COOKIE"] = cookies_str
             with open('.env', 'w') as env_file:
                 env_file.write(f"CLAUDE_COOKIE={os.environ['CLAUDE_COOKIE']}")
