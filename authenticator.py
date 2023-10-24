@@ -26,8 +26,11 @@ class ClaudeAuthenticator:
                     break
 
             os.environ["CLAUDE_COOKIE"] = cookies_str
-            with open('.env', 'w') as env_file:
-                env_file.write(f"CLAUDE_COOKIE={os.environ['CLAUDE_COOKIE']}")
+            with open('.env', 'r') as env_file:
+                existing_env = env_file.read()
+                if not f"CLAUDE_COOKIE=" in existing_env:
+                    with open('.env', 'a') as env_file:
+                        env_file.write(f"\nCLAUDE_COOKIE={cookies_str}")
 
     async def process_async(self, _):
 
@@ -49,5 +52,9 @@ class ClaudeAuthenticator:
                     break
 
             os.environ["CLAUDE_COOKIE"] = cookies_str
-            with open('.env', 'w') as env_file:
-                env_file.write(f"CLAUDE_COOKIE={os.environ['CLAUDE_COOKIE']}")
+            with open('.env', 'r') as env_file:
+                existing_env = env_file.read()
+                if not f"CLAUDE_COOKIE=" in existing_env:
+                    with open('.env', 'a') as env_file:
+                        env_file.write(f"\nCLAUDE_COOKIE={cookies_str}")
+
