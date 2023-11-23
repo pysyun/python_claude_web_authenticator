@@ -1,4 +1,3 @@
-import os
 from authenticator import ClaudeAuthenticator
 from dialog import ClaudeDialog
 
