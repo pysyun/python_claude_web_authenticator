@@ -68,3 +68,35 @@ class ClaudeClientOverride(Client):
 
         # Returns answer
         return answer
+
+        # Renames the chat conversation title
+
+    def rename_chat(self, title, conversation_id):
+        url = f"https://claude.ai/api/organizations/{self.organization_id}/chat_conversations/{conversation_id}"
+
+        payload = json.dumps({
+            "name": f"{title}"
+        })
+        headers = {
+            'User-Agent':
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Content-Type': 'application/json',
+            'Referer': f'https://claude.ai/chat/{self.organization_id}',
+            'Origin': 'https://claude.ai',
+            'Sec-Fetch-Dest': 'empty',
+            'Sec-Fetch-Mode': 'cors',
+            'Sec-Fetch-Site': 'same-origin',
+            'Connection': 'keep-alive',
+            'Cookie': f'{self.cookie}',
+            'TE': 'trailers'
+        }
+
+        response = requests.put(url, headers=headers, data=payload, impersonate="chrome110")
+        print(response)
+        print(response.content)
+
+        if response.status_code == 200:
+            return True
+        else:
+            return False
