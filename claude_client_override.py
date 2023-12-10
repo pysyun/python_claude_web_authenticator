@@ -93,9 +93,6 @@ class ClaudeClientOverride(Client):
         }
 
         response = requests.put(url, headers=headers, data=payload, impersonate="chrome110")
-        print(response)
-        print(response.content)
-
         if response.status_code == 200:
             return True
         else:
