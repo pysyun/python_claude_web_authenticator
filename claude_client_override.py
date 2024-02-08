@@ -9,7 +9,8 @@ class ClaudeClientOverride(Client):
 
     # Send Message to Claude
     def send_message(self, prompt, conversation_id, attachment=None, timeout=500):
-        url = "https://claude.ai/api/append_message"
+        url = f"https://claude.ai/api/organizations/{self.organization_id}/chat_conversations/{conversation_id}/completion"
+
 
         # Upload attachment if provided
         attachments = []
@@ -25,23 +26,21 @@ class ClaudeClientOverride(Client):
             attachments = []
 
         payload = json.dumps({
-            "completion": {
-                "prompt": f"{prompt}",
-                "timezone": "Asia/Kolkata",
-                "model": "claude-2.1"
-            },
-            "organization_uuid": f"{self.organization_id}",
-            "conversation_uuid": f"{conversation_id}",
-            "text": f"{prompt}",
-            "attachments": attachments
+
+            "prompt": f"{prompt}",
+            "attachments": attachments,
+            "files": [],
+            "timezone": "Asia/Kolkata",
+            "model": "claude-2.1"
+
         })
 
         headers = {
-            'User-Agent':
+           'User-Agent':
                 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0',
             'Accept': 'text/event-stream, text/event-stream',
             'Accept-Language': 'en-US,en;q=0.5',
-            'Referer': 'https://claude.ai/chats',
+            'Referer': f'https://claude.ai/chats',
             'Content-Type': 'application/json',
             'Origin': 'https://claude.ai',
             'DNT': '1',
@@ -59,10 +58,12 @@ class ClaudeClientOverride(Client):
         data_strings = decoded_data.split('\n')
         completions = []
         for data_string in data_strings:
-            json_str = data_string[6:].strip()
-            data = json.loads(json_str)
-            if 'completion' in data:
-                completions.append(data['completion'])
+            if data_string != 'event: completion' and data_string != 'event: ping':
+                json_str = data_string[6:].strip()
+                data = json.loads(json_str)
+                if 'completion' in data:
+                    completions.append(data['completion'])
+
 
         answer = ''.join(completions)
 
@@ -79,7 +80,7 @@ class ClaudeClientOverride(Client):
         })
         headers = {
             'User-Agent':
-                'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0',
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/122.0',
             'Accept-Language': 'en-US,en;q=0.5',
             'Content-Type': 'application/json',
             'Referer': f'https://claude.ai/chat/{self.organization_id}',
