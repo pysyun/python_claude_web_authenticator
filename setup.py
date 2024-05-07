@@ -6,5 +6,8 @@ setup(
     author='Immortal Tapok',
     author_email='irisa1704@gmail.com',
     py_modules=['authenticator', 'dialog', 'claude_client_override'],
-    install_requires=['playwright', 'python-dotenv', 'claude-api']
+    install_requires=['python-dotenv', 'claude-api'],
+    extras_require={
+        'authenticator': ['playwright']
+    }
 )
