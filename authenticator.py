@@ -1,12 +1,20 @@
 import os
-
-from playwright.sync_api import sync_playwright
-from playwright.async_api import async_playwright
+try:
+    from playwright.sync_api import sync_playwright
+    from playwright.async_api import async_playwright
+except ImportError:
+    sync_playwright = None
+    async_playwright = None
 
 
 class ClaudeAuthenticator:
+    @staticmethod
+    def process(_):
 
-    def process(self, _):
+        if sync_playwright is None:
+            raise ImportError(
+                "Playwright is not installed. Please install it with 'pip install playwright', after that install "
+                "Firefox with 'playwright install firefox'")
 
         if 'CLAUDE_COOKIE' in os.environ:
             return
@@ -32,7 +40,12 @@ class ClaudeAuthenticator:
                     with open('.env', 'a') as env_file:
                         env_file.write(f"\nCLAUDE_COOKIE={cookies_str}")
 
-    async def process_async(self, _):
+    @staticmethod
+    async def process_async(_):
+        if async_playwright is None:
+            raise ImportError(
+                "Playwright is not installed. Please install it with 'pip install playwright', after that install "
+                "Firefox with 'playwright install firefox'")
 
         if 'CLAUDE_COOKIE' in os.environ:
             return
