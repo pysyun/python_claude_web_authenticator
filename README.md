@@ -41,9 +41,9 @@ The library provides the following methods to interact with Claude:
 Here's an example of how to use the library to send a message to Claude and create a new chat:
 
 ```python
-from claude_client_override import ClaudeClientOverride
+from claude_client_override import Client
 
-claude_api = ClaudeClientOverride(claude_cookie)
+claude_api = Client(claude_cookie)
 prompt = "Hello, Claude!"
 conversation_id = claude_api.create_new_chat()['uuid']
 response = claude_api.send_message(prompt, conversation_id)

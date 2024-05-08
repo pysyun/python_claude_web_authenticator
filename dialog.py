@@ -1,6 +1,6 @@
 import os
 
-from claude_client_override import ClaudeClientOverride
+from claude_client_override import Client
 
 
 class ClaudeDialog:
@@ -9,7 +9,7 @@ class ClaudeDialog:
         self.claude_cookie = os.environ['CLAUDE_COOKIE']
 
     def process(self, data):
-        claude_api = ClaudeClientOverride(self.claude_cookie)
+        claude_api = Client(self.claude_cookie)
         prompt = data[0]
         conversation_id = claude_api.create_new_chat()['uuid']
         response = claude_api.send_message(prompt, conversation_id)
