@@ -1,4 +1,4 @@
-#from authenticator import ClaudeAuthenticator
+from authenticator import ClaudeAuthenticator
 from dialog import ClaudeDialog
 
 from dotenv import load_dotenv
@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Authenticate using the automated Browser or saved token
-#ClaudeAuthenticator().process([])
+ClaudeAuthenticator().process([])
 
 # Create the Claude API client
 dialog = ClaudeDialog()
