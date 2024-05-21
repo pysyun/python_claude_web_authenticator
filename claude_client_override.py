@@ -2,17 +2,27 @@ import json
 import os
 import uuid
 import requests
+import httpx
 import re
 
 
 class Client:
 
-    def __init__(self, cookie):
+    def __init__(self, cookie, organization_id=None):
         self.cookie = cookie
-        self.organization_id = self.get_organization_id()
+        if not organization_id:
+            self.organization_id = self.get_organization_id()
+            os.environ["ORGANIZATION_ID"] = self.organization_id
+            with open('.env', 'r') as env_file:
+                existing_env = env_file.read()
+                if not f"ORGANIZATION_ID=" in existing_env:
+                    with open('.env', 'a') as env_file:
+                        env_file.write(f"\nORGANIZATION_ID={self.organization_id}")
+        else:
+            self.organization_id = organization_id
 
     def get_organization_id(self):
-        url = "https://claude.ai//api/auth/current_account"
+        url = "https://claude.ai/api/bootstrap"
 
         headers = {
             'User-Agent':
@@ -27,9 +37,9 @@ class Client:
             'Cookie': f'{self.cookie}'
         }
 
-        response = requests.get(url, headers=headers)
+        response = httpx.get(url, headers=headers)
         res = json.loads(response.text)
-        uuid = next(iter(res['messageLimits']))
+        uuid = res['account']['memberships'][0]['organization']['uuid']
 
         return uuid
 
@@ -63,7 +73,7 @@ class Client:
             'Cookie': f'{self.cookie}'
         }
 
-        response = requests.get(url, headers=headers)
+        response = httpx.get(url, headers=headers)
         conversations = response.json()
 
         # Returns all conversation information in a list
@@ -116,8 +126,8 @@ class Client:
             'TE': 'trailers'
         }
 
-        response = requests.post(url, headers=headers, data=payload, timeout=500)
-        decoded_data = response.content.decode("utf-8")
+        response = httpx.post(url, headers=headers, data=payload, timeout=500)
+        decoded_data = response.content.decode(response.encoding)
         decoded_data = re.sub('\n+', '\n', decoded_data).strip()
         data_strings = decoded_data.split('\n')
         completions = []
@@ -180,7 +190,7 @@ class Client:
             'Cookie': f'{self.cookie}'
         }
 
-        response = requests.get(url, headers=headers)
+        response = httpx.get(url, headers=headers)
 
         # List all the conversations in JSON
         return response.json()
@@ -198,12 +208,12 @@ class Client:
         payload = json.dumps({"uuid": uuid, "name": ""})
         headers = {
             'Accept': '*/*',
-            'Accept-Encoding': 'gzip, deflate, br',
+            'Accept-Encoding': 'gzip, deflate, br, zstd',
             'anthropic-client-sha': 'unknown',
             'anthropic-client-version': 'unknown',
             'Alt-Used': 'claude.ai',
             'User-Agent':
-                'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:123.0) Gecko/20100101 Firefox/123.0',
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:126.0) Gecko/20100101 Firefox/126.0',
             'Accept-Language': 'en-US;q=0.5,en;q=0.3',
             'Referer': 'https://claude.ai/chats',
             'Content-Type': 'application/json',
@@ -215,8 +225,7 @@ class Client:
             'TE': 'trailers',
         }
 
-        response = requests.post(url, headers=headers, data=payload)
-
+        response = httpx.post(url, headers=headers, data=payload)
         # Returns JSON of the newly created conversation information
         return response.json()
 
@@ -267,7 +276,7 @@ class Client:
             'orgUuid': (None, self.organization_id)
         }
 
-        response = requests.post(url, headers=headers, files=files)
+        response = httpx.post(url, headers=headers, files=files)
         if response.status_code == 200:
             return response.json()
         else:
