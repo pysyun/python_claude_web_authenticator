@@ -27,7 +27,7 @@ class Client:
         headers = {
             'User-Agent':
                 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0',
-            'Accept-Language': 'en-US,en;q=0.5',
+            'Accept-Language': 'ru-RU,ru;q=0.8,en-US;q=0.5,en;q=0.3',
             'Referer': 'https://claude.ai/login',
             'Content-Type': 'application/json',
             'Sec-Fetch-Dest': 'empty',
@@ -83,7 +83,7 @@ class Client:
             print(f"Error: {response.status_code} - {response.text}")
 
     # Send Message to Claude
-    def send_message(self, prompt, conversation_id, attachment=None, timeout=500):
+    def send_message(self, prompt, conversation_id, attachment=None):
         url = f"https://claude.ai/api/organizations/{self.organization_id}/chat_conversations/{conversation_id}/completion"
 
 
@@ -110,7 +110,6 @@ class Client:
         })
 
         headers = {
-            'Accept-Encoding': 'gzip, deflate, br',
            'User-Agent':
                 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0',
             'Accept': 'text/event-stream, text/event-stream',
@@ -137,7 +136,6 @@ class Client:
                 data = json.loads(json_str)
                 if 'completion' in data:
                     completions.append(data['completion'])
-
 
         answer = ''.join(completions)
 
@@ -214,7 +212,7 @@ class Client:
             'Alt-Used': 'claude.ai',
             'User-Agent':
                 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:126.0) Gecko/20100101 Firefox/126.0',
-            'Accept-Language': 'en-US;q=0.5,en;q=0.3',
+            'Accept-Language': 'ru-RU,ru;q=0.8,en-US;q=0.5,en;q=0.3',
             'Referer': 'https://claude.ai/chats',
             'Content-Type': 'application/json',
             'Origin': 'https://claude.ai',
@@ -282,6 +280,31 @@ class Client:
         else:
             return False
 
+    def get_title(self, conversation_id, bot_message, prompt):
+        url = f"https://claude.ai/api/organizations/{self.organization_id}/chat_conversations/{conversation_id}/title"
+
+        data = {
+            'message': f"Message 1:\n\n{prompt}\n\nMessage 2:\n\n{bot_message}",
+            'recent_titles': []
+        }
+
+        headers = {
+            'User-Agent':
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0',
+            'Accept-Language': 'en-US;q=0.5,en;q=0.3',
+            'Referer': f'https://claude.ai/chat/{conversation_id}',
+            'Content-Type': 'application/json',
+            'Origin': 'https://claude.ai',
+            'Cookie': f'{self.cookie}',
+            'Sec-Fetch-Dest': 'empty',
+            'Sec-Fetch-Mode': 'cors',
+            'Sec-Fetch-Site': 'same-origin',
+            'TE': 'trailers'
+        }
+
+        response = httpx.post(url, headers=headers, data=data, timeout=500)
+        return response
+
     # Renames the chat conversation title
     def rename_chat(self, title, conversation_id):
         url = f"https://claude.ai/api/organizations/{self.organization_id}/chat_conversations/{conversation_id}"
@@ -291,20 +314,19 @@ class Client:
         })
         headers = {
             'User-Agent':
-                'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/122.0',
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:127.0) Gecko/20100101 Firefox/127.0',
             'Accept-Language': 'en-US,en;q=0.5',
             'Content-Type': 'application/json',
-            'Referer': f'https://claude.ai/chat/{self.organization_id}',
+            'Referer': f'https://claude.ai/chat/{conversation_id}',
             'Origin': 'https://claude.ai',
             'Sec-Fetch-Dest': 'empty',
             'Sec-Fetch-Mode': 'cors',
             'Sec-Fetch-Site': 'same-origin',
             'Connection': 'keep-alive',
             'Cookie': f'{self.cookie}',
-            'TE': 'trailers'
         }
 
-        response = requests.put(url, headers=headers, data=payload)
+        response = httpx.put(url, headers=headers, data=payload, timeout=500)
         if response.status_code == 200:
             return True
         else:

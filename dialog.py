@@ -7,9 +7,10 @@ class ClaudeDialog:
 
     def __init__(self):
         self.claude_cookie = os.environ['CLAUDE_COOKIE']
+        self.organization_id = os.environ.get('ORGANIZATION_ID')
 
     def process(self, data):
-        claude_api = Client(self.claude_cookie)
+        claude_api = Client(self.claude_cookie, self.organization_id)
         prompt = data[0]
         conversation_id = claude_api.create_new_chat()['uuid']
         response = claude_api.send_message(prompt, conversation_id)
