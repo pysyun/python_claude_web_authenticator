@@ -1,4 +1,5 @@
 import os
+import re
 
 from claude_client_override import Client
 
@@ -14,6 +15,8 @@ class ClaudeDialog:
         prompt = data[0]
         conversation_id = claude_api.create_new_chat()['uuid']
         response = claude_api.send_message(prompt, conversation_id)
+        if re.match(r'^ERROR', response):
+            return [response]
         title_chat_id = claude_api.create_new_chat()['uuid']
         title = claude_api.send_message(f'Generate only a title for this text: {response}', title_chat_id)
         claude_api.rename_chat(title, conversation_id)
