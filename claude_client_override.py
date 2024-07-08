@@ -126,6 +126,8 @@ class Client:
         }
 
         response = httpx.post(url, headers=headers, data=payload, timeout=500)
+        if not response.status_code == 200:
+            return f'ERROR: {response.text}'
         decoded_data = response.content.decode(response.encoding)
         decoded_data = re.sub('\n+', '\n', decoded_data).strip()
         data_strings = decoded_data.split('\n')
@@ -206,7 +208,6 @@ class Client:
         payload = json.dumps({"uuid": uuid, "name": ""})
         headers = {
             'Accept': '*/*',
-            'Accept-Encoding': 'gzip, deflate, br, zstd',
             'anthropic-client-sha': 'unknown',
             'anthropic-client-version': 'unknown',
             'Alt-Used': 'claude.ai',

@@ -1,4 +1,5 @@
 import os
+import re
 try:
     from playwright.sync_api import sync_playwright
     from playwright.async_api import async_playwright
@@ -36,7 +37,7 @@ class ClaudeAuthenticator:
             os.environ["CLAUDE_COOKIE"] = cookies_str
             with open('.env', 'r') as env_file:
                 existing_env = env_file.read()
-                if not f"CLAUDE_COOKIE=" in existing_env:
+                if not re.search(r'^CLAUDE_COOKIE=', existing_env, re.MULTILINE):
                     with open('.env', 'a') as env_file:
                         env_file.write(f"\nCLAUDE_COOKIE={cookies_str}")
 
@@ -67,7 +68,6 @@ class ClaudeAuthenticator:
             os.environ["CLAUDE_COOKIE"] = cookies_str
             with open('.env', 'r') as env_file:
                 existing_env = env_file.read()
-                if not f"CLAUDE_COOKIE=" in existing_env:
+                if not re.search(r'^CLAUDE_COOKIE=', existing_env, re.MULTILINE):
                     with open('.env', 'a') as env_file:
                         env_file.write(f"\nCLAUDE_COOKIE={cookies_str}")
-
