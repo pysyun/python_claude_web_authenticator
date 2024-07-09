@@ -15,7 +15,7 @@ class Client:
             os.environ["ORGANIZATION_ID"] = self.organization_id
             with open('.env', 'r') as env_file:
                 existing_env = env_file.read()
-                if not f"ORGANIZATION_ID=" in existing_env:
+                if not re.search(r'^ORGANIZATION_ID=', existing_env, re.MULTILINE):
                     with open('.env', 'a') as env_file:
                         env_file.write(f"\nORGANIZATION_ID={self.organization_id}")
         else:
@@ -224,7 +224,7 @@ class Client:
             'TE': 'trailers',
         }
 
-        response = httpx.post(url, headers=headers, data=payload)
+        response = httpx.post(url, headers=headers, data=payload, timeout=500)
         # Returns JSON of the newly created conversation information
         return response.json()
 
